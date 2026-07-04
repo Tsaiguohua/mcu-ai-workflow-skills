@@ -5,8 +5,19 @@
 ## 包含的 Skill
 
 - `embedded-workflow-orchestrator`: 总控工作流，把资料、接口、需求、代码、验证和维护串起来。
+- 升级为“嵌入式 AI 项目经理”
+- 增加项目状态判断：新项目、老项目加功能、排错、移植、bring-up 等
+- 增加资料完整度检查
+- 增加 skill 自动调度规则
+- 增加常见组合流程
+- 增加项目记忆回写要求
 - `mcu-datasheet-extractor`: 芯片手册提取。
 - `schematic-interface-analyzer`: 原理图/网表接口分析。
+- 增强硬件坑扫描
+- 增加 P0-P3 风险分级
+- 增加有效电平、上电默认态、BOOT/SWD/JTAG、I2C/SPI/UART/USB/SDIO/FSMC、电源等风险检查
+- 增加复用冲突表
+- 增加和现有代码宏定义联动检查
 - `product-requirement-organizer`: 产品需求整理。
 - `project-workbench-builder`: 项目工作台搭建。
 - `firmware-dev-executor`: 固件开发、编译、修复执行。
