@@ -1,0 +1,4 @@
+interface:
+  display_name: "嵌入式项目学习复盘"
+  short_description: "阶段性总结嵌入式项目的新功能、硬件连接、协议、代码实现和后续学习重点"
+  default_prompt: "$embedded-project-learning-retrospective 帮我复盘当前嵌入式项目本阶段完成的功能，输出 Markdown 文档到项目目录，讲清硬件、协议、代码实现、问题解决和下一步。"
