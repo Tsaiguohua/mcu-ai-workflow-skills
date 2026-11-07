@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.15)
+project(uart_fragmentation C)
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+add_executable(parser_before parser.c)
+add_executable(parser_after parser.c)
+target_compile_definitions(parser_before PRIVATE KEEP_PARTIAL=0)
+target_compile_definitions(parser_after PRIVATE KEEP_PARTIAL=1)

@@ -68,6 +68,10 @@ description: 编排 MCU 和嵌入式项目的多环节任务，先判定只读�
 | 从零写固件 | `firmware-dev-executor` | 分层代码、工程维护、编译修复、验证步骤 |
 | 接手老项目、源码问答 | `source-maintenance-reader` | 当前目标、源码地图、调用链、事实与风险 |
 | 需要交接或阶段性复盘 | `embedded-project-learning-retrospective` | 已确认事实、验证证据、未决项和下一步 |
+| 根据现场证据排错或做回归 | `embedded-debug-loop` | 候选原因、最小实验、结果和后续动作 |
+| 需要选择采集信号、窗口或触发 | `embedded-telemetry-planner` | 采集计划与判据 |
+| 获准构建、串口接收、离线回放，或准备烧录方案 | `firmware-build-flash-runner` | 独立日志、产物哈希、原始数据或烧录预览 |
+| 只读复核固件改动 | `firmware-quality-reviewer` | 可触发问题与验证缺口 |
 | 功能移植 | `source-maintenance-reader`；获准实施时再用 `firmware-dev-executor` | 可移植逻辑与目标差异；实施时补改动与验证记录 |
 | 项目卡住不知道下一步 | 本 skill 先诊断 | 下一步行动计划 |
 
@@ -103,11 +107,12 @@ description: 编排 MCU 和嵌入式项目的多环节任务，先判定只读�
 3. `mcu-datasheet-extractor` 补目标芯片差异
 4. 获准实施后由 `firmware-dev-executor` 分层适配、剪裁、编译修复
 
-### 排查硬件相关问题
+### 排查硬件或通信问题
 
 1. `source-maintenance-reader` 读现有代码路径
 2. `schematic-interface-analyzer` 检查电平、复用、危险输出
-3. 给出最能区分假设的验证；获准修改后再由 `firmware-dev-executor` 添加必要的最小验证代码或日志点
+3. 用 `embedded-debug-loop` 选择能区分原因的实验；缺少信号时用 `embedded-telemetry-planner` 给出采集计划。
+4. 在获准范围内使用运行器保留证据，再决定是否由 `firmware-dev-executor` 修复并回归。需要独立复核时调用质量检查；没有本轮板端证据就保留未验证状态。
 
 ## 项目记忆要求
 
