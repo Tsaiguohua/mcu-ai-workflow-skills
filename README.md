@@ -1,6 +1,6 @@
 # 嵌入式 AI Skills 复现包
 
-一套面向 MCU 和 RTOS 工程的 Codex 技能。覆盖从资料整理、工程理解和固件开发，到用日志、回放和实验逐步排查问题。
+一套面向 **MCU、RTOS 和嵌入式 Linux** 的 Codex 技能。覆盖资料整理、工程理解、开发和验证。技能可在 Linux 或 Windows 开发机上使用；自动化命令取决于本机工具链和目标工程。
 
 ## 包含的 Skill
 
@@ -25,12 +25,26 @@
 
 把需要的 skill 目录完整复制到 Codex 的 skills 目录后使用，保留目录内的模板等资源。建议先在真实项目副本中验证，不要直接对生产项目做大规模自动修改。
 
+Linux 上使用 Codex CLI 时，可以把需要的技能目录放到 `~/.agents/skills/`，或放进具体项目的 `.agents/skills/`。安装路径见 [Codex 技能官方说明](https://learn.chatgpt.com/docs/build-skills#where-codex-loads-local-skills)。
+
 总入口按本轮意图区分只读、方案和实施。典型用法：
 
 - 「帮我读一下这个旧工程的串口接收路径，先别改代码。」先核对实际构建目标和生效的源码，给出证据和待验证项。
 - 「给旧工程补个项目索引，记录实际构建目标和资料位置，目录别动。」工作台优先复用项目现有文档，也可使用其[索引](project-workbench-builder/assets/project-index.md)和[状态](project-workbench-builder/assets/project-status.md)模板。
 - 「接着上次查串口丢帧，先看项目状态和调试记录。」先对照当前源码、构建目标和上次证据，再从未完成的验证继续。需要阶段性总结时，使用项目学习复盘。
 - 「我已经有串口抓包，帮我区分是接收漏字节还是拼帧出错。」先核对抓包来自哪个目标和固件，再设计能区分两种原因的实验。只在用户授权时执行对应操作。
+- 「嵌入式 Linux 板上外设没有创建设备节点，先帮我定位。」先核对实际启动的 DTB、内核配置与驱动绑定，再看目标板的日志；不把开发机的内核或设备节点当作板端证据。
+
+## Linux 开发
+
+| 场景 | 当前支持 |
+| --- | --- |
+| 在 Linux 开发机上跑工具 | 用 `python3` 运行 CMake 构建、离线回放和检查；串口接收需 pySerial 及对所选设备的访问权限 |
+| 开发嵌入式 Linux 用户态应用 | 用现有 Makefile/CMake 和项目工具链，核对目标架构、sysroot、动态库及板端日志 |
+| 查嵌入式 Linux BSP、设备树和驱动 | 按内核版本、配置、实际 DTB、驱动绑定和设备节点追踪；构建和部署沿用项目的 Kbuild 或厂商 SDK |
+| 使用 Keil 工程 | 自动构建命令 `build-keil` 调用 Windows 的 `UV4.exe`；Linux 上仍可用 `targets` 只读查看工程配置 |
+
+嵌入式 Linux 的具体排查步骤见[源码阅读指南](source-maintenance-reader/references/embedded-linux.md)。运行器当前封装 Keil 和 CMake，不替代 Kbuild、厂商镜像构建或板端部署工具。
 
 ## 第二批：构建、调试与证据
 
@@ -44,15 +58,17 @@
 
 ### 无板卡复现实例
 
-从仓库根目录运行以下命令。样例需 CMake、Ninja 和可用的主机 C 编译器：
+从仓库根目录运行以下命令。样例需 CMake、Ninja 和可用的主机 C 编译器；Windows 上可把 `python3` 改为 `python`：
 
 ```text
-python firmware-build-flash-runner/scripts/board_runner.py probe
-python examples/uart-fragmentation/run_demo.py --out-dir demo-runs
-python -B -m unittest discover -s tests -v
+python3 firmware-build-flash-runner/scripts/board_runner.py probe
+python3 examples/uart-fragmentation/run_demo.py --out-dir demo-runs
+python3 -B -m unittest discover -s tests -v
 ```
 
 样例将一帧以 `2+2` 字节离线回放，分别构建并运行修复前后的 C 解析器：旧版漏报，修复版输出完整帧，整帧和短尾部输入也要通过。运行目录保留原始字节、构建报告、产物哈希和回归结果。测试还检查错误目标、构建失败、旧产物、超时、断连和越界烧录计划；模拟结果不表示真实硬件已经验证。
+
+[Ubuntu 主机验证](https://github.com/Tsaiguohua/mcu-ai-workflow-skills/actions/workflows/linux-smoke.yml)运行同一套单元测试和无板卡样例。它验证的是 Linux 开发机上的工具行为；板卡、驱动加载、镜像启动与实物采集需要单独验证。
 
 ## 核心思想
 

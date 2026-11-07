@@ -51,7 +51,8 @@ class RunnerTests(unittest.TestCase):
             if write:
                 self.artifact.write_bytes(b"fresh firmware")
             return SimpleNamespace(returncode=return_code)
-        with patch.object(runner, "executable", return_value="UV4.exe"), \
+        with patch.object(runner, "keil_host_supported", return_value=True), \
+                patch.object(runner, "executable", return_value="UV4.exe"), \
                 patch.object(runner.subprocess, "run", side_effect=fake_build) as call:
             result = self.invoke("build-keil", "--project", self.project, "--target", target,
                                  "--artifact", self.artifact, "--board", "demo")
@@ -70,6 +71,17 @@ class RunnerTests(unittest.TestCase):
         self.assertNotEqual(code, 0)
         self.assertEqual((result["status"], calls), ("failed", 0))
 
+    def test_keil_refuses_non_windows_without_resolving_or_running_the_tool(self):
+        with patch.object(runner, "keil_host_supported", return_value=False), \
+                patch.object(runner, "executable") as resolve, \
+                patch.object(runner.subprocess, "run") as run:
+            code, result = self.invoke("build-keil", "--project", self.project, "--target", "Board A",
+                                       "--artifact", self.artifact)
+        self.assertNotEqual(code, 0)
+        self.assertIn("requires Windows", result["error"])
+        resolve.assert_not_called()
+        run.assert_not_called()
+
     def test_existing_file_does_not_prove_a_build(self):
         self.artifact.write_bytes(b"stale firmware")
         code, result, _ = self.keil(write=False)
@@ -85,7 +97,8 @@ class RunnerTests(unittest.TestCase):
                 self.assertNotIn("artifact", result)
 
     def test_timeout_does_not_claim_fresh_firmware(self):
-        with patch.object(runner, "executable", return_value="UV4.exe"), \
+        with patch.object(runner, "keil_host_supported", return_value=True), \
+                patch.object(runner, "executable", return_value="UV4.exe"), \
                 patch.object(runner.subprocess, "run", side_effect=subprocess.TimeoutExpired("UV4", 1)):
             code, result = self.invoke("build-keil", "--project", self.project, "--target", "Board A",
                                        "--artifact", self.artifact, "--timeout", 1)

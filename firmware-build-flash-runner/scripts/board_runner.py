@@ -49,6 +49,10 @@ def fingerprint(path):
     return (info.st_mtime_ns, info.st_size, digest(path))
 
 
+def keil_host_supported():
+    return os.name == "nt"
+
+
 def executable(value):
     found = shutil.which(value)
     if not found:
@@ -137,6 +141,8 @@ def build(args, run_dir, result):
     result.update({"target": args.target, "board": args.board, "source_id": args.source_id})
     if not args.target.strip() or args.target.startswith("-"):
         raise RunnerError("Specify an exact build target name")
+    if args.command == "build-keil" and not keil_host_supported():
+        raise RunnerError("build-keil requires Windows and UV4.exe; use targets for read-only inspection")
     tool = executable(args.tool or ("UV4.exe" if args.command == "build-keil" else "cmake"))
     if args.command == "build-keil":
         project = args.project.resolve()
@@ -391,7 +397,10 @@ def main(argv=None):
     run_dir = None
     try:
         if args.command == "probe":
-            result.update({"status": "inspected", "uv4": shutil.which(args.uv4),
+            keil_supported = keil_host_supported()
+            result.update({"status": "inspected", "host_os": sys.platform,
+                           "keil_host_supported": keil_supported,
+                           "uv4": shutil.which(args.uv4) if keil_supported else None,
                            "cmake": shutil.which(args.cmake), "programmer": shutil.which(args.programmer),
                            "pyserial_module": importlib.util.find_spec("serial") is not None})
         elif args.command == "targets":

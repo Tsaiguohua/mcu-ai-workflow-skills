@@ -1,0 +1,29 @@
+name: Linux host smoke test
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/linux-smoke.yml'
+      - 'firmware-build-flash-runner/scripts/**'
+      - 'examples/uart-fragmentation/**'
+      - 'tests/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Probe Linux host
+        run: python3 -B firmware-build-flash-runner/scripts/board_runner.py probe
+      - name: Run offline runner tests
+        run: python3 -B -m unittest discover -s tests -v
+      - name: Build and replay the host example
+        run: python3 -B examples/uart-fragmentation/run_demo.py --out-dir "$RUNNER_TEMP/uart-demo"
