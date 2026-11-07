@@ -64,6 +64,7 @@ description: 编排 MCU、RTOS 和嵌入式 Linux 项目的多环节任务。判
 | 场景 | 优先 skill | 输出 |
 |---|---|---|
 | 新项目资料散乱 | `project-workbench-builder` | 标准目录、项目状态、项目规则文件草案 |
+| 缺少官方手册、勘误、BSP 或版本化资料 | `embedded-reference-fetcher` | 来源与匹配依据；获准时归档原件和校验记录 |
 | 新芯片/新外设 | `mcu-datasheet-extractor` | 手册摘录、寄存器/时序/电气参数速查 |
 | 原理图/网表/接口不清 | `schematic-interface-analyzer` | 硬件接口表、危险输出、硬件坑扫描 |
 | 客户需求混乱 | `product-requirement-organizer` | 可验证产品需求、状态机、变更记录 |
@@ -74,7 +75,7 @@ description: 编排 MCU、RTOS 和嵌入式 Linux 项目的多环节任务。判
 | 需要选择采集信号、窗口或触发 | `embedded-telemetry-planner` | 采集计划与判据 |
 | 获准构建、串口接收、离线回放，或准备烧录方案 | `firmware-build-flash-runner` | 独立日志、产物哈希、原始数据或烧录预览 |
 | 只读复核固件改动 | `firmware-quality-reviewer` | 可触发问题与验证缺口 |
-| 功能移植 | `source-maintenance-reader`；获准实施时再用 `firmware-dev-executor` | 可移植逻辑与目标差异；实施时补改动与验证记录 |
+| 换芯片、板卡、SDK 或 Linux BSP | `source-maintenance-reader` + `embedded-migration-planner` | 源与目标差异、待核实项、分步计划与回归 |
 | 项目卡住不知道下一步 | 本 skill 先诊断 | 下一步行动计划 |
 
 ## 常见组合流程
@@ -106,8 +107,9 @@ description: 编排 MCU、RTOS 和嵌入式 Linux 项目的多环节任务。判
 
 1. `source-maintenance-reader` 识别源项目依赖
 2. `schematic-interface-analyzer` 确认目标板接口
-3. `mcu-datasheet-extractor` 补目标芯片差异
-4. 获准实施后由 `firmware-dev-executor` 分层适配、剪裁、编译修复
+3. 需要资料时先核对官方来源，再由 `mcu-datasheet-extractor` 或 Linux 源码分析补上目标证据。
+4. `embedded-migration-planner` 区分已证实差异、可复用部分、待核实项及回归顺序。
+5. 获准实施后由 `firmware-dev-executor` 按计划适配和验证；缺少目标证据的步骤不能据此扩大权限。
 
 ### 排查硬件或通信问题
 

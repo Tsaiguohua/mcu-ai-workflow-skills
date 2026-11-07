@@ -4,16 +4,18 @@
 
 ## 包含的 Skill
 
-当前收录 12 个技能，可按任务单独使用。
+当前收录 14 个技能，可按任务单独使用。
 
 | 技能 | 用途 |
 | --- | --- |
 | [embedded-workflow-orchestrator](embedded-workflow-orchestrator/SKILL.md) | 判断任务范围，选择技能，跨会话交接 |
 | [project-workbench-builder](project-workbench-builder/SKILL.md) | 整理工程索引、构建目标、资料和进度 |
+| [embedded-reference-fetcher](embedded-reference-fetcher/SKILL.md) | 查找、核对并按授权归档版本明确的官方资料 |
 | [mcu-datasheet-extractor](mcu-datasheet-extractor/SKILL.md) | 提取手册中的引脚、时序、电气参数及出处 |
 | [schematic-interface-analyzer](schematic-interface-analyzer/SKILL.md) | 核对原理图、引脚复用、电源、上电状态和危险输出 |
 | [product-requirement-organizer](product-requirement-organizer/SKILL.md) | 整理产品行为、边界和验收条件 |
 | [source-maintenance-reader](source-maintenance-reader/SKILL.md) | 确认当前构建目标、读旧源码和追踪调用链 |
+| [embedded-migration-planner](embedded-migration-planner/SKILL.md) | 比较源与目标板卡、SDK/BSP 和工具链，给出分步迁移与回归计划 |
 | [firmware-dev-executor](firmware-dev-executor/SKILL.md) | 在授权范围内实现、构建和回归 |
 | [embedded-project-learning-retrospective](embedded-project-learning-retrospective/SKILL.md) | 复盘证据和未决项，让下轮接着做 |
 | [embedded-debug-loop](embedded-debug-loop/SKILL.md) | 排序候选原因，设计可区分假设的实验 |
@@ -68,7 +70,13 @@ python3 -B -m unittest discover -s tests -v
 
 样例将一帧以 `2+2` 字节离线回放，分别构建并运行修复前后的 C 解析器：旧版漏报，修复版输出完整帧，整帧和短尾部输入也要通过。运行目录保留原始字节、构建报告、产物哈希和回归结果。测试还检查错误目标、构建失败、旧产物、超时、断连和越界烧录计划；模拟结果不表示真实硬件已经验证。
 
-[Ubuntu 主机验证](https://github.com/Tsaiguohua/mcu-ai-workflow-skills/actions/workflows/linux-smoke.yml)运行同一套单元测试和无板卡样例。它验证的是 Linux 开发机上的工具行为；板卡、驱动加载、镜像启动与实物采集需要单独验证。
+[Ubuntu 主机验证](https://github.com/Tsaiguohua/mcu-ai-workflow-skills/actions/workflows/linux-smoke.yml)运行同一套单元测试和无板卡样例。资料归档测试使用离线响应，检查跳转、格式、摘要、大小和已有归档保护；板卡、驱动加载、镜像启动与实物采集仍需单独验证。
+
+## 第三批：资料来源与迁移计划
+
+- 只查找时给官方链接与适用依据；明确要求归档时，用 [资料归档工具](embedded-reference-fetcher/references/archive.md) 保留原文件和 `source.json`。记录来源、版本和 SHA-256，不覆盖旧记录，不自动解压或执行。
+- 手册摘录用版本、页序、印刷页码和图表定位；接口有冲突时并列原理图、网表和代码证据。需求文档区分已确认的期望行为、当前实现与差异。
+- 换芯片、板卡、SDK 或 Linux BSP 时，用 [迁移矩阵](embedded-migration-planner/assets/migration-plan.md) 写清两侧证据、兼容性、改动顺序、验收和回退。只要方案时不改工程或设备。
 
 ## 核心思想
 
